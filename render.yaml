@@ -5,9 +5,11 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /auth/health
     envVars:
-      - key: SUPABASE_DB_URL
-        value: jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:5432/postgres?user=postgres.jrfmcepglxmolpdblvyc&sslmode=require
-      - key: SPRING_DATASOURCE_PASSWORD
+      - key: DB_URL
+        value: jdbc:postgresql://detecteyebased.cxi028a2qjlg.us-east-2.rds.amazonaws.com:5432/detecteyebased
+      - key: DB_USERNAME
+        value: detecteye_admin
+      - key: DB_PASSWORD
         sync: false
       - key: JWT_SECRET
         generateValue: true

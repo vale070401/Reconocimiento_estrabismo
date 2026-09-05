@@ -32,11 +32,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @GetMapping("/confirm")
-    public AuthResponse confirm(@RequestParam String token) {
-        return authService.confirmToken(token);
-    }
-
     @PostMapping("/register/paciente")
     public ResponseEntity<RegisterResponse> registerPaciente(@RequestBody RegisterPacienteRequest request) {
         return ResponseEntity.ok(authService.register(request));

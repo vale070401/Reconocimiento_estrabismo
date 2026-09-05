@@ -47,10 +47,17 @@ conflictos.
 Configura en el servicio donde está desplegado Spring Boot:
 
 ```text
-SUPABASE_DB_URL=jdbc:postgresql://aws-0-REGION.pooler.supabase.com:5432/postgres?user=postgres.PROJECT_REF&password=URL_ENCODED_PASSWORD&sslmode=require
+SUPABASE_DB_URL=jdbc:postgresql://aws-0-REGION.pooler.supabase.com:5432/postgres?sslmode=require
+SPRING_DATASOURCE_USERNAME=postgres.PROJECT_REF
+SPRING_DATASOURCE_PASSWORD=...
 JWT_SECRET=...
 CORS_ALLOWED_ORIGINS=https://dominio-del-frontend
 ```
+
+No uses la URI `postgresql://...` que muestra Supabase para herramientas de
+migración como valor de `SUPABASE_DB_URL`: Spring Boot requiere el prefijo
+`jdbc:postgresql://`. Separar usuario y contraseña evita problemas con
+caracteres especiales y permite marcarlos como secretos en Render.
 
 Reinicia el backend. Hibernate usa `ddl-auto=validate`, por lo que comprobará el
 esquema sin crear, eliminar ni alterar tablas.

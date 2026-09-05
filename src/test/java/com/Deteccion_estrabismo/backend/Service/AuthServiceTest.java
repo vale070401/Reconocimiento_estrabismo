@@ -14,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,8 +29,6 @@ class AuthServiceTest {
     @Mock private PacientesRepository pacientesRepository;
     @Mock private AdministradorRepository administradorRepository;
     @Mock private ResponsableRepository responsableRepository;
-    @Mock private ConfirmationTokenRepository tokenRepository;
-    @Mock private SendGridEmailService emailService;
     @Mock private BuildObjectMapper mapper;
 
     @InjectMocks
@@ -82,31 +79,6 @@ class AuthServiceTest {
         assertNotNull(response.getError());
     }
 
-    // ========== PRUEBAS PARA CONFIRMAR TOKEN ==========
-
-    @Test
-    void confirmToken_WhenValidToken_ShouldEnableUserAndReturnJWT() {
-        // Arrange
-        String token = "valid-token";
-        ConfirmationToken confirmationToken = ConfirmationToken.builder()
-                .token(token).expiresAt(LocalDateTime.now().plusHours(1)).usuarioId("1").build();
-        Usuarios usuario = new Usuarios();
-        usuario.setId(1L);
-        usuario.setEnabled(false);
-
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
-        when(usuariosRepository.findById(1L)).thenReturn(Optional.of(usuario));
-        when(jwtService.generateToken(usuario)).thenReturn("new-jwt");
-
-        // Act
-        AuthResponse response = authService.confirmToken(token);
-
-        // Assert
-        assertTrue(usuario.isEnabled());
-        assertNotNull(response.getToken());
-        verify(usuariosRepository).save(usuario);
-    }
-
     // ========== PRUEBAS PARA REGISTER ==========
 
     @Test
@@ -127,7 +99,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void register_WhenPacienteWithRegistroCivil_ShouldCreateWithoutEmailConfirmation() {
+    void register_WhenPacienteWithRegistroCivil_ShouldCreatePaciente() {
         // Arrange
         RegisterPacienteRequest request = new RegisterPacienteRequest();
         request.setTipoDocumento(TipoDocumento.REGISTRO_CIVIL);
@@ -145,11 +117,10 @@ class AuthServiceTest {
         // Assert
         assertTrue(response.isSuccess());
         verify(pacientesRepository).save(any(Pacientes.class));
-        verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
     }
 
     @Test
-    void register_WhenResponsable_ShouldCreateWithEmailConfirmation() {
+    void register_WhenResponsable_ShouldCreateEnabledUser() {
         // Arrange
         RegisterResponsableRequest request = new RegisterResponsableRequest();
         request.setTipoDocumento(TipoDocumento.CC);
@@ -172,17 +143,11 @@ class AuthServiceTest {
 
         // Assert
         assertTrue(response.isSuccess());
-        verify(emailService).sendEmail(
-                eq("responsable@test.com"),
-                anyString(),
-                anyString()
-        );
-        verify(tokenRepository).save(any(ConfirmationToken.class));
-
+        verify(responsableRepository).save(argThat(Responsable::isEnabled));
     }
 
     @Test
-    void register_WhenAdministrador_ShouldCreateWithEmailConfirmation() {
+    void register_WhenAdministrador_ShouldCreateEnabledUser() {
         // Arrange
         RegisterAdminRequest request = new RegisterAdminRequest();
         request.setTipoDocumento(TipoDocumento.CC);
@@ -205,12 +170,7 @@ class AuthServiceTest {
 
         // Assert
         assertTrue(response.isSuccess());
-        verify(emailService).sendEmail(
-                eq("admin@test.com"),
-                anyString(),
-                anyString()
-        );
-        verify(tokenRepository).save(any(ConfirmationToken.class));
+        verify(administradorRepository).save(argThat(Administrador::isEnabled));
     }
 
     @Test
@@ -261,7 +221,7 @@ class AuthServiceTest {
 
         // Assert - Verificar que se setean los defaults correctamente
         verify(responsableRepository).save(argThat(responsable ->
-                !responsable.isEnabled() &&
+                responsable.isEnabled() &&
                         responsable.getRol() != null
         ));
     }
@@ -286,7 +246,7 @@ class AuthServiceTest {
 
         // Assert
         verify(administradorRepository).save(argThat(admin ->
-                !admin.isEnabled() &&
+                admin.isEnabled() &&
                         admin.getRol() != null
         ));
     }

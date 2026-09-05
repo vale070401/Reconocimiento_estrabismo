@@ -43,12 +43,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Validación (ej. @Email, @NotNull) -->
-		<dependency>
-    	<groupId>com.sendgrid</groupId>
-    	<artifactId>sendgrid-java</artifactId>
-    	<version>4.9.3</version>
-		</dependency>
 		<!--Exponer el API REST-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

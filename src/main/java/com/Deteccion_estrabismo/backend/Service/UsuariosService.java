@@ -1,6 +1,5 @@
 package com.Deteccion_estrabismo.backend.Service;
 
-import com.Deteccion_estrabismo.backend.Repository.ConfirmationTokenRepository;
 import com.Deteccion_estrabismo.backend.Repository.UsuariosRepository;
 import com.Deteccion_estrabismo.backend.Entities.Usuarios;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,7 @@ public class UsuariosService {
 
     private UsuariosRepository usuariosRepository;
 
-    public UsuariosService(UsuariosRepository usuariosRepository, ConfirmationTokenRepository tokenRepository,
-            SendGridEmailService emailService) {
+    public UsuariosService(UsuariosRepository usuariosRepository) {
         this.usuariosRepository = usuariosRepository;
     }
 

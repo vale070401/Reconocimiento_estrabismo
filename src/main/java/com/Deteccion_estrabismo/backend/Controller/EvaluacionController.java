@@ -19,18 +19,18 @@ public class EvaluacionController {
     @PostMapping
     public ResponseEntity<?> crearEvaluacion(@RequestBody EvaluacionRequestDto request) {
         try {
-            System.out.println("📥 Recibiendo evaluación para documento: " + request.getDocumentoIdentidad());
+            log.info("📥 Recibiendo evaluación para documento: " + request.getDocumentoIdentidad());
 
             EvaluacionResponseDto evaluacion = evaluacionService.crearEvaluacion(request);
 
-            System.out.println("✅ Evaluación guardada exitosamente para documento: " + request.getDocumentoIdentidad());
+            log.info("✅ Evaluación guardada exitosamente para documento: " + request.getDocumentoIdentidad());
             return ResponseEntity.ok(evaluacion);
 
         } catch (RuntimeException e) {
-            System.out.println("❌ Error creando evaluación: " + e.getMessage());
+            log.error("❌ Error creando evaluación: " + e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("💥 Error interno: " + e.getMessage());
+            log.error("💥 Error interno: " + e.getMessage());
             return ResponseEntity.internalServerError().body("Error interno del servidor");
         }
     }

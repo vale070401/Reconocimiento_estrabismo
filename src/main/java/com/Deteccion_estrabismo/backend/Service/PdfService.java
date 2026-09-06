@@ -40,7 +40,7 @@ public class PdfService {
             Pacientes paciente = pacienteRepository.findByDocumentoIdentidad(documentoIdentidad)
                     .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
-            List<Evaluacion> evaluaciones = evaluacionRepository.findByPacienteDocumentoIdentidad(documentoIdentidad);
+            List<Evaluacion> evaluaciones = evaluacionRepository.findByPacienteId(paciente.getId());
 
             // Crear PDF en memoria
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
